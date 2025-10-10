@@ -1,0 +1,17 @@
+# Phoenix Smart Locator AI - Requirements
+
+# Core dependencies (required)
+beautifulsoup4>=4.14.0
+requests>=2.31.0
+lxml>=6.0.0
+soupsieve>=2.8
+typing_extensions>=4.15.0
+
+# AI Model integration (optional - for Gemini enhancement)
+google-generativeai>=0.3.0
+
+# Optional: For enhanced HTML parsing
+html5lib>=1.1
+
+# Optional: For environment variable management
+python-dotenv>=1.0.0
