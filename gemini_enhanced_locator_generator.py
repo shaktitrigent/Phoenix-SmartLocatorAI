@@ -18,7 +18,7 @@ try:
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
-    print("⚠️ Google Generative AI not available. Install with: pip install google-generativeai")
+    print("WARNING: Google Generative AI not available. Install with: pip install google-generativeai")
 
 
 class GeminiEnhancedLocatorGenerator(LocatorGenerator):
@@ -39,7 +39,7 @@ class GeminiEnhancedLocatorGenerator(LocatorGenerator):
     def _initialize_gemini(self):
         """Initialize Gemini client"""
         if not GEMINI_AVAILABLE:
-            print("⚠️ Gemini not available. Running in basic mode.")
+            print("WARNING: Gemini not available. Running in basic mode.")
             return
         
         api_key = os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
@@ -47,12 +47,12 @@ class GeminiEnhancedLocatorGenerator(LocatorGenerator):
             try:
                 genai.configure(api_key=api_key)
                 self.gemini_client = genai.GenerativeModel(self.model_name)
-                print(f"✅ Gemini {self.model_name} client initialized")
+                print(f"SUCCESS: Gemini {self.model_name} client initialized")
             except Exception as e:
-                print(f"⚠️ Failed to initialize Gemini: {e}")
+                print(f"WARNING: Failed to initialize Gemini: {e}")
                 self.gemini_client = None
         else:
-            print("⚠️ Gemini API key not found. Set GOOGLE_API_KEY or GEMINI_API_KEY environment variable.")
+            print("WARNING: Gemini API key not found. Set GOOGLE_API_KEY or GEMINI_API_KEY environment variable.")
     
     def _call_gemini(self, prompt: str, context: str = "") -> str:
         """Call Gemini API with the given prompt"""
@@ -77,11 +77,11 @@ class GeminiEnhancedLocatorGenerator(LocatorGenerator):
         Returns:
             Dictionary with enhanced locators and AI analysis
         """
-        print("🚀 Generating Gemini-enhanced locators...")
+        print("INFO: Generating Gemini-enhanced locators...")
         
         # Generate base locators using the parent class
         base_locators = self.generate_locators(html_or_url, target_selector)
-        print(f"✅ Generated {len(base_locators)} base locators")
+        print(f"SUCCESS: Generated {len(base_locators)} base locators")
         
         # Get HTML content for AI analysis
         if self._is_url(html_or_url):
@@ -330,43 +330,36 @@ class GeminiEnhancedLocatorGenerator(LocatorGenerator):
             raise ValueError("Format must be 'json' or 'markdown'")
     
     def _generate_markdown_report(self, results: Dict[str, Any]) -> str:
-        """Generate markdown report"""
-        report = f"""# Gemini-Enhanced Locator Analysis Report
-
-Generated on: {results['generated_at']}
-AI Provider: {results['ai_provider']}
-Model: {results['model']}
-Total Locators: {results['total_locators']}
-
-## AI Analysis
-
-### Page Type
-{results['ai_analysis'].get('page_type', 'Unknown')}
-
-### Element Quality Score
-{results['ai_analysis'].get('element_quality_score', 'N/A')}
-
-### Best Strategies
-{results['ai_analysis'].get('best_strategies', [])}
-
-### Potential Issues
-{results['ai_analysis'].get('potential_issues', [])}
-
-### Best Practices Compliance
-{results['ai_analysis'].get('best_practices_compliance', 'N/A')}
-
-### Maintenance Risk Score
-{results['ai_analysis'].get('maintenance_risk_score', 'N/A')}
-
-### Overall Recommendations
-{results['ai_analysis'].get('overall_recommendations', [])}
-
-## AI Recommendations
-
-"""
+        """Generate markdown report with structured locator output"""
         
-        for i, rec in enumerate(results['ai_recommendations']):
-            report += f"""### Element {i+1} ({rec.get('element_name', 'Unknown')})
+        # Generate structured locators
+        structured_locators = self._generate_structured_locators(results.get('locators', []))
+        
+        # Handle AI analysis with proper error checking
+        ai_analysis = results.get('ai_analysis', {})
+        if 'error' in ai_analysis:
+            page_type = "Unknown (AI not available)"
+            quality_score = "N/A (AI not available)"
+            best_strategies = "[] (AI not available)"
+            potential_issues = "[] (AI not available)"
+            best_practices = "N/A (AI not available)"
+            maintenance_risk = "N/A (AI not available)"
+            overall_recommendations = "[] (AI not available)"
+        else:
+            page_type = ai_analysis.get('page_type', 'Unknown')
+            quality_score = ai_analysis.get('element_quality_score', 'N/A')
+            best_strategies = ai_analysis.get('best_strategies', [])
+            potential_issues = ai_analysis.get('potential_issues', [])
+            best_practices = ai_analysis.get('best_practices_compliance', 'N/A')
+            maintenance_risk = ai_analysis.get('maintenance_risk_score', 'N/A')
+            overall_recommendations = ai_analysis.get('overall_recommendations', [])
+        
+        # Handle AI recommendations
+        ai_recommendations = results.get('ai_recommendations', [])
+        recommendations_section = ""
+        if ai_recommendations:
+            for i, rec in enumerate(ai_recommendations):
+                recommendations_section += f"""### Element {i+1} ({rec.get('element_name', 'Unknown')})
 **Missing Attributes**: {rec.get('missing_attributes', [])}
 **Better Strategies**: {rec.get('better_strategies', [])}
 **Risk Assessment**: {rec.get('risk_assessment', 'N/A')}
@@ -374,32 +367,243 @@ Total Locators: {results['total_locators']}
 **Specific Suggestions**: {rec.get('specific_suggestions', [])}
 
 """
+        else:
+            recommendations_section = "No AI recommendations available (AI not available)\n"
         
-        report += """## Generated Code
+        # Handle AI code generation
+        ai_code = results.get('ai_code', {})
+        if 'error' in ai_code:
+            selenium_code = "Code not available (AI not available)"
+            playwright_code = "Code not available (AI not available)"
+            cypress_code = "Code not available (AI not available)"
+        else:
+            selenium_code = ai_code.get('selenium', 'Code not available')
+            playwright_code = ai_code.get('playwright', 'Code not available')
+            cypress_code = ai_code.get('cypress', 'Code not available')
+        
+        report = f"""# Gemini-Enhanced Locator Analysis Report
+
+Generated on: {results['generated_at']}
+AI Provider: {results['ai_provider']}
+Model: {results['model']}
+Total Locators: {results['total_locators']}
+
+{structured_locators}
+
+## AI Analysis
+
+### Page Type
+{page_type}
+
+### Element Quality Score
+{quality_score}
+
+### Best Strategies
+{best_strategies}
+
+### Potential Issues
+{potential_issues}
+
+### Best Practices Compliance
+{best_practices}
+
+### Maintenance Risk Score
+{maintenance_risk}
+
+### Overall Recommendations
+{overall_recommendations}
+
+## AI Recommendations
+
+{recommendations_section}
+
+## Generated Code
 
 ### Selenium Code
 ```python
-{results['ai_code'].get('selenium', 'Code not available')}
+{selenium_code}
 ```
 
 ### Playwright Code
 ```python
-{results['ai_code'].get('playwright', 'Code not available')}
+{playwright_code}
 ```
 
 ### Cypress Code
 ```javascript
-{results['ai_code'].get('cypress', 'Code not available')}
+{cypress_code}
 ```
 """
         
         return report
+    
+    def _generate_structured_locators(self, locators: List[Dict[str, Any]]) -> str:
+        """Generate structured locator output with custom names and sections"""
+        
+        # Group locators by element type and functionality
+        login_elements = []
+        product_elements = []
+        navigation_elements = []
+        other_elements = []
+        
+        for locator in locators:
+            element_name = locator.get('element_name', '')
+            tag_name = locator.get('tag_name', '')
+            selector = locator.get('selector', '')
+            locator_type = locator.get('type', '')
+            
+            # Create custom name based on element
+            custom_name = self._generate_custom_name(element_name, tag_name, locator)
+            
+            # Categorize elements
+            if 'login' in element_name.lower() or 'username' in element_name.lower() or 'password' in element_name.lower():
+                login_elements.append({
+                    'custom_name': custom_name,
+                    'locator_type': self._get_locator_type_name(locator_type),
+                    'locator_value': selector,
+                    'stability': locator.get('stability', 'Medium')
+                })
+            elif 'product' in element_name.lower() or 'cart' in element_name.lower() or 'buy' in element_name.lower() or 'wishlist' in element_name.lower():
+                product_elements.append({
+                    'custom_name': custom_name,
+                    'locator_type': self._get_locator_type_name(locator_type),
+                    'locator_value': selector,
+                    'stability': locator.get('stability', 'Medium')
+                })
+            elif 'breadcrumb' in element_name.lower() or 'nav' in element_name.lower() or 'contact' in element_name.lower() or 'home' in element_name.lower():
+                navigation_elements.append({
+                    'custom_name': custom_name,
+                    'locator_type': self._get_locator_type_name(locator_type),
+                    'locator_value': selector,
+                    'stability': locator.get('stability', 'Medium')
+                })
+            else:
+                other_elements.append({
+                    'custom_name': custom_name,
+                    'locator_type': self._get_locator_type_name(locator_type),
+                    'locator_value': selector,
+                    'stability': locator.get('stability', 'Medium')
+                })
+        
+        # Generate structured output
+        output = "## Well-Structured Locators for Test Automation\n\n"
+        output += "Here are well-structured locators and custom names for key elements in your HTML sample, usable in Playwright or Selenium Python automation. Each locator utilizes stable attributes (ID, class, data-test, tag, text) and includes an appropriate custom name for clarity.\n\n"
+        
+        # Login Form Elements
+        if login_elements:
+            output += "### Login Form Elements\n"
+            output += "| Custom Name | Locator Type | Locator Value | Stability |\n"
+            output += "|-------------|--------------|---------------|----------|\n"
+            for elem in login_elements[:5]:  # Limit to top 5
+                output += f"| {elem['custom_name']} | {elem['locator_type']} | `{elem['locator_value']}` | {elem['stability']} |\n"
+            output += "\n"
+        
+        # Product Info Section
+        if product_elements:
+            output += "### Product Info Section\n"
+            output += "| Custom Name | Locator Type | Locator Value | Stability |\n"
+            output += "|-------------|--------------|---------------|----------|\n"
+            for elem in product_elements[:5]:  # Limit to top 5
+                output += f"| {elem['custom_name']} | {elem['locator_type']} | `{elem['locator_value']}` | {elem['stability']} |\n"
+            output += "\n"
+        
+        # Navigation and Footer
+        if navigation_elements:
+            output += "### Navigation and Footer\n"
+            output += "| Custom Name | Locator Type | Locator Value | Stability |\n"
+            output += "|-------------|--------------|---------------|----------|\n"
+            for elem in navigation_elements[:5]:  # Limit to top 5
+                output += f"| {elem['custom_name']} | {elem['locator_type']} | `{elem['locator_value']}` | {elem['stability']} |\n"
+            output += "\n"
+        
+        # Other Elements
+        if other_elements:
+            output += "### Other Elements\n"
+            output += "| Custom Name | Locator Type | Locator Value | Stability |\n"
+            output += "|-------------|--------------|---------------|----------|\n"
+            for elem in other_elements[:5]:  # Limit to top 5
+                output += f"| {elem['custom_name']} | {elem['locator_type']} | `{elem['locator_value']}` | {elem['stability']} |\n"
+            output += "\n"
+        
+        # Add usage examples
+        output += "### Example Usage (Selenium Python)\n"
+        output += "```python\n"
+        example_count = 0
+        for elem in (login_elements + product_elements + navigation_elements)[:4]:
+            if example_count < 4:
+                output += f"driver.find_element(By.{elem['locator_type'].upper().replace(' ', '_')}, '{elem['locator_value']}') # {elem['custom_name']}\n"
+                example_count += 1
+        output += "```\n\n"
+        
+        output += "These locators use explicit attributes (IDs, classes, data-* attributes) for maximum reliability and maintainability, making them ideal for AI-driven locator generation and resilient test automation.\n\n"
+        
+        return output
+    
+    def _generate_custom_name(self, element_name: str, tag_name: str, locator: Dict[str, Any]) -> str:
+        """Generate a custom name for the element"""
+        selector = locator.get('selector', '')
+        
+        # Extract meaningful parts from element name
+        if 'username' in element_name.lower():
+            return 'UsernameInput'
+        elif 'password' in element_name.lower():
+            return 'PasswordInput'
+        elif 'login' in element_name.lower() and 'button' in element_name.lower():
+            return 'LoginButton'
+        elif 'add-to-cart' in element_name.lower():
+            return 'AddToCartButton'
+        elif 'buy-now' in element_name.lower():
+            return 'BuyNowButton'
+        elif 'wishlist' in element_name.lower():
+            return 'WishlistButton'
+        elif 'product-image' in element_name.lower():
+            return 'ProductImage'
+        elif 'description' in element_name.lower():
+            return 'ProductDescription'
+        elif 'home' in element_name.lower():
+            return 'BreadcrumbHome'
+        elif 'electronics' in element_name.lower():
+            return 'BreadcrumbElectronics'
+        elif 'contact' in element_name.lower():
+            return 'ContactLink'
+        elif 'footer' in element_name.lower():
+            return 'FooterSection'
+        elif 'breadcrumb' in element_name.lower():
+            return 'BreadcrumbNav'
+        else:
+            # Generate name from tag and index
+            return f"{tag_name.capitalize()}{element_name.split('_')[-1] if '_' in element_name else 'Element'}"
+    
+    def _get_locator_type_name(self, locator_type: str) -> str:
+        """Convert locator type to readable name"""
+        type_mapping = {
+            'ID': 'CSS Selector',
+            'CSS Class': 'CSS Selector',
+            'Data Test': 'CSS Selector',
+            'Attribute': 'CSS Selector',
+            'Button Text': 'XPath',
+            'Link Text': 'Link Text',
+            'XPath Text': 'XPath',
+            'XPath ID': 'XPath',
+            'XPath Data Attribute': 'XPath',
+            'XPath Contains Text': 'XPath',
+            'XPath Contains Attribute': 'XPath',
+            'XPath Position': 'XPath',
+            'XPath Parent-Child': 'XPath',
+            'XPath Class Combination': 'XPath',
+            'XPath Name+Type': 'XPath',
+            'CSS Name+Type': 'CSS Selector',
+            'CSS Partial Class': 'CSS Selector',
+            'CSS Attribute Presence': 'CSS Selector',
+            'Name': 'CSS Selector'
+        }
+        return type_mapping.get(locator_type, 'CSS Selector')
 
 
 def demo_gemini_enhanced():
     """Demo the Gemini-enhanced locator generator"""
     
-    print("🤖 GEMINI-ENHANCED LOCATOR GENERATOR DEMO")
+    print("GEMINI-ENHANCED LOCATOR GENERATOR DEMO")
     print("=" * 60)
     
     # Sample HTML
@@ -444,20 +648,20 @@ def demo_gemini_enhanced():
     # Generate enhanced locators
     results = generator.generate_gemini_enhanced_locators(sample_html)
     
-    print(f"✅ Generated {results['total_locators']} locators")
-    print(f"✅ AI Provider: {results['ai_provider']}")
-    print(f"✅ Model: {results['model']}")
+    print(f"SUCCESS: Generated {results['total_locators']} locators")
+    print(f"SUCCESS: AI Provider: {results['ai_provider']}")
+    print(f"SUCCESS: Model: {results['model']}")
     
     # Display AI analysis
     analysis = results['ai_analysis']
-    print(f"\n🧠 AI Analysis:")
+    print(f"\nAI Analysis:")
     print(f"  • Page Type: {analysis.get('page_type', 'Unknown')}")
     print(f"  • Quality Score: {analysis.get('element_quality_score', 'N/A')}")
     print(f"  • Best Strategies: {analysis.get('best_strategies', [])}")
     print(f"  • Maintenance Risk: {analysis.get('maintenance_risk_score', 'N/A')}")
     
     # Display recommendations
-    print(f"\n💡 AI Recommendations ({len(results['ai_recommendations'])} elements):")
+    print(f"\nAI Recommendations ({len(results['ai_recommendations'])} elements):")
     for i, rec in enumerate(results['ai_recommendations'][:3]):
         print(f"  {i+1}. Element: {rec.get('element_name', 'Unknown')}")
         print(f"     Priority: {rec.get('improvement_priority', 'N/A')}")
@@ -465,7 +669,7 @@ def demo_gemini_enhanced():
     
     # Display code generation
     code = results['ai_code']
-    print(f"\n💻 AI-Generated Code:")
+    print(f"\nAI-Generated Code:")
     print(f"  • Selenium: {len(code.get('selenium', ''))} characters")
     print(f"  • Playwright: {len(code.get('playwright', ''))} characters")
     print(f"  • Cypress: {len(code.get('cypress', ''))} characters")
@@ -474,11 +678,11 @@ def demo_gemini_enhanced():
     json_file = generator.export_gemini_enhanced_results(results, 'json')
     md_file = generator.export_gemini_enhanced_results(results, 'markdown')
     
-    print(f"\n📄 Reports saved:")
+    print(f"\nReports saved:")
     print(f"  • JSON: {json_file}")
     print(f"  • Markdown: {md_file}")
     
-    print(f"\n🎉 Gemini-Enhanced Demo Complete!")
+    print(f"\nGemini-Enhanced Demo Complete!")
     print("=" * 60)
 
 
