@@ -1,148 +1,154 @@
 # Phoenix Smart Locator AI
 
-An intelligent web element locator generator that provides comprehensive locator strategies with optional AI enhancement using Google Gemini.
+Unified, zero-setup pipeline to scan a page (URL or HTML), generate robust locators (CSS/XPath/Playwright Role), score stability, flag dynamics/duplicates, validate in a real browser (optional with auth), and export ready-to-use Page Objects and reports.
 
-## 🚀 Features
+## Features
 
-### Core Features (No AI Required)
-- ✅ **ALL web elements detection** - Finds every element on the page
-- ✅ **Intelligent element naming** - Context-aware naming based on attributes
-- ✅ **Priority-based suggestions** - High/Medium/Low priority recommendations
-- ✅ **Comprehensive locator generation** - Multiple locator strategies per element
-- ✅ **Export functionality** - JSON, CSV, and code generation
+- DOM scan (requests/BeautifulSoup; optional Playwright render)
+- Locator generation: CSS, XPath, Playwright getByRole/getByText
+- Stability scoring (1–10) + High/Medium/Low labels
+- Dynamic/duplicate detection + warnings
+- Framework compatibility tagging (Playwright/Selenium/Both)
+- Code snippets per locator (Playwright/Selenium)
+- Optional real-browser validation with auth (Playwright)
+- Exports: Markdown report, JSON, Page Objects (Playwright/Selenium)
 
-### AI-Enhanced Features (Gemini Optional)
-- 🧠 **Intelligent page analysis** - Detects page type and quality scores
-- 🎯 **Advanced recommendations** - Element-specific improvement suggestions
-- 💻 **Production-ready code** - Generates Selenium, Playwright, Cypress code
-- 📊 **Risk assessment** - Identifies potential issues and maintenance risks
-
-## 📦 Installation
+## Install
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd Phoenix-SmartLocatorAI
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-## 🎯 Quick Start
-
-### Basic Usage (No AI)
-```python
-from locator_generator import LocatorGenerator
-
-generator = LocatorGenerator()
-locators = generator.generate_locators(html_content)
-
-for locator in locators:
-    print(f"Element: {locator['element_name']}")
-    print(f"Type: {locator['type']}")
-    print(f"Selector: {locator['selector']}")
-    print(f"High Priority: {locator['suggestions']['High']}")
-```
-
-### AI-Enhanced Usage (Gemini)
-```python
-from gemini_enhanced_locator_generator import GeminiEnhancedLocatorGenerator
-
-# Set your Gemini API key
-import os
-os.environ['GOOGLE_API_KEY'] = 'your_api_key_here'
-
-generator = GeminiEnhancedLocatorGenerator()
-results = generator.generate_gemini_enhanced_locators(html_content)
-
-print(f"Page Type: {results['ai_analysis']['page_type']}")
-print(f"Quality Score: {results['ai_analysis']['element_quality_score']}")
-```
-
-## 🎮 Demo Scripts
+## Quick Start (Unified Pipeline)
 
 ```bash
-# Pure Python demo (no AI required)
-python pure_python_demo.py
+# From URL (no auth), export both POMs, keep Medium+ stability
+python smart_locator_ai.py \
+  --url https://example.com \
+  --framework both \
+  --min-stability Medium
 
-# Gemini-enhanced demo (requires API key)
-python gemini_demo.py
-
-# Enhanced features demo
-python enhanced_demo.py
+# From local HTML
+python smart_locator_ai.py --file ./page.html --framework playwright
 ```
 
-## 🔧 Setup for AI Features
+Outputs are written to `exports/`:
+- `report.md` (summary + markdown table)
+- `locators.json` (integration-ready with metadata)
+- `page.py` (standardized Page Object for primary framework)
+- `<ClassName>_Playwright.py` and/or `<ClassName>_Selenium.py` (framework-specific)
 
-1. **Get Gemini API Key**: Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. **Set Environment Variable**:
-   ```bash
-   # Windows
-   $env:GOOGLE_API_KEY='your_api_key_here'
-   
-   # Linux/Mac
-   export GOOGLE_API_KEY='your_api_key_here'
-   ```
-3. **Install AI Dependencies**:
-   ```bash
-   pip install google-generativeai
-   ```
+### Integration-Ready JSON Format
 
-## 📊 Example Output
+The `locators.json` file includes comprehensive metadata for integration:
 
-### Core Features
-```
-✅ Found 145 locators for ALL web elements
-✅ Found 21 unique elements with intelligent names
-
-💡 Priority Suggestions:
-  🔴 High: Use ID selector: #login-btn - Most reliable and fast
-  🟡 Medium: Combine with other attributes: #login-btn[class*='specific-class']
-  🟢 Low: Use XPath equivalent: //*[@id='login-btn']
-```
-
-### AI-Enhanced Features
-```
-🧠 AI Analysis:
-  • Page Type: e-commerce
-  • Quality Score: 8/10
-  • Best Strategies: ['Data Test', 'ID', 'XPath Data Attribute']
-  • Maintenance Risk: 4/10
-
-💻 AI-Generated Code:
-  • Selenium: 3,034 characters
-  • Playwright: 4,358 characters
-  • Cypress: 3,371 characters
+```json
+{
+  "metadata": {
+    "generated_at": "2025-11-10T12:37:38.133894",
+    "source": "https://example.com",
+    "total_elements": 10,
+    "total_locators": 25,
+    "framework": "both",
+    "min_stability": "Medium",
+    "validated": true,
+    "ai_enriched": false,
+    "class_name": "ProductPage"
+  },
+  "summary": {
+    "total_elements": 10,
+    "locator_distribution": {"css": 15, "xpath": 8, "role": 2},
+    "framework_split": {"playwright": 10, "selenium": 8, "both": 7},
+    "stability": {"high": 12, "medium": 10, "low": 3}
+  },
+  "locators": [...],
+  "ai_enrichment": {...}  // if --gemini used
+}
 ```
 
-## 📁 Project Structure
+Each locator entry includes:
+- `custom_name`: Human-readable element name
+- `locator_type`: CSS Selector, XPath, Role Selector, etc.
+- `locator_value`: The actual locator string
+- `stability`: High/Medium/Low
+- `stability_score`: 1-10 numeric score
+- `automation_tool`: Playwright/Selenium/Both
+- `playwright_code`: Ready-to-use Playwright snippet
+- `selenium_code`: Ready-to-use Selenium snippet
+- `validated`: true/false (if --validate used)
+- `match_count`: Number of elements matched (if validated)
+- `dynamic`: true/false (detected dynamic attributes)
+- `duplicate`: true/false (duplicate IDs/names)
+- `warnings`: Array of warnings
 
+## Authenticated Validation (Playwright)
+
+Option A: Use storage state
+```bash
+python smart_locator_ai.py \
+  --url https://your.app/page \
+  --validate \
+  --auth-storage-state path/to/storage_state.json
 ```
-Phoenix-SmartLocatorAI/
-├── locator_generator.py                    # Core system
-├── gemini_enhanced_locator_generator.py    # AI enhancement
-├── pure_python_demo.py                     # Basic demo
-├── gemini_demo.py                          # AI demo
-├── enhanced_demo.py                        # Features demo
-├── requirements.txt                        # Dependencies
-└── README.md                              # This file
+
+Option B: Scripted login
+```bash
+python smart_locator_ai.py \
+  --url https://your.app/protected \
+  --validate \
+  --auth-url https://your.app/login \
+  --auth-user USER --auth-pass PASS \
+  --user-selector "#username" \
+  --pass-selector "#password" \
+  --submit-selector "button[type='submit']" \
+  --auth-wait-selector "a.main-menu"
 ```
 
-## 🎯 Use Cases
+Notes:
+- Validates each locator; adds `validated`, `match_count`, and `validation_error` fields.
+- Works for URL inputs; validation is skipped for raw HTML.
 
-- **Test Automation**: Generate reliable locators for Selenium, Playwright, Cypress
-- **Web Scraping**: Find and identify elements for data extraction
-- **Quality Assurance**: Analyze page structure and element stability
-- **Development**: Understand element relationships and naming conventions
+## Programmatic Usage
 
-## 📄 License
+```python
+from smart_locator_ai import SmartLocatorAI
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+runner = SmartLocatorAI()
+paths = runner.run(
+    html_or_url="https://example.com",
+    framework="both",
+    min_stability="Medium",
+    use_js=False,
+    class_name="ProductPage",
+    validate=False,
+)
+print(paths)
+```
 
-## 🤝 Contributing
+## CLI Reference
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```bash
+python smart_locator_ai.py --help
+```
+Key flags:
+- Input: `--url | --file | --html`
+- Framework: `--framework both|playwright|selenium`
+- Filter: `--min-stability High|Medium|Low`
+- JS render: `--js`
+- Class name: `--class-name ProductPage`
+- Validation: `--validate`
+- Auth (optional): `--auth-storage-state`, or scripted login with `--auth-url --auth-user --auth-pass --user-selector --pass-selector --submit-selector --auth-wait-selector|--auth-wait-url-contains`
 
-## 📞 Support
+## Minimal Project Files
 
-For questions or issues, please open an issue on the repository.
+- `smart_locator_ai.py` (orchestrates end-to-end)
+- `dom_scanner.py` (scan, locator generation, reporting helpers)
+- `page_object_exporter.py` (POM generation)
+- `requirements.txt`
+- `exports/` (generated outputs)
+
+Legacy/demo files (Gemini, demos) are not required for Smart Locator AI pipeline.
+
+## License
+
+MIT (see `LICENSE`).
