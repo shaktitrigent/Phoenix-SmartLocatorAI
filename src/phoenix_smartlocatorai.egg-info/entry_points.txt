@@ -1,0 +1,2 @@
+[console_scripts]
+phoenix-locgen = phoenix_smartlocatorai.cli:main

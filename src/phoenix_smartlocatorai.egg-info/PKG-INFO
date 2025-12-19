@@ -1,21 +1,56 @@
+Metadata-Version: 2.4
+Name: phoenix-smartlocatorai
+Version: 1.0.0
+Summary: Automated locator generation for Playwright and Selenium test automation
+Author-email: Phoenix Smart Locator AI <support@phoenixlocator.ai>
+License: MIT
+Keywords: test-automation,selenium,playwright,locators,page-objects,web-scraping
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: beautifulsoup4>=4.14.0
+Requires-Dist: requests>=2.31.0
+Requires-Dist: lxml>=6.0.0
+Requires-Dist: soupsieve>=2.8
+Provides-Extra: gemini
+Requires-Dist: google-generativeai>=0.3.0; extra == "gemini"
+Provides-Extra: playwright
+Requires-Dist: playwright>=1.40.0; extra == "playwright"
+Provides-Extra: all
+Requires-Dist: google-generativeai>=0.3.0; extra == "all"
+Requires-Dist: playwright>=1.40.0; extra == "all"
+Dynamic: license-file
+
 # Phoenix Smart Locator AI
 
-Automatically generate Playwright and Selenium locators from HTML files or URLs. Get stability-scored locators, framework compatibility detection, and ready-to-use Page Object Model classes with a single command.
+A Python package that automatically generates Playwright and Selenium locators from HTML files or URLs, with stability scoring, framework compatibility detection, and ready-to-use Page Object Model exports.
 
-## 🚀 Features
+## Features
 
-- **🔍 DOM Scanning**: Extract interactable elements from HTML files or live URLs
-- **🎯 Multi-Framework Support**: Generate locators for Playwright, Selenium, or both simultaneously
-- **⭐ Stability Scoring**: Automatic scoring (1-10) and categorization (High/Medium/Low)
-- **🧠 Smart Locator Generation**: CSS selectors, XPath, and Playwright role/text selectors
-- **⚠️ Dynamic Detection**: Flag unstable attributes (UUIDs, timestamps, dynamic IDs)
-- **🔎 Duplicate Detection**: Identify duplicate IDs and names automatically
-- **💻 Code Generation**: Ready-to-use code snippets for each framework
-- **📦 Page Object Export**: Generate complete Page Object classes with proper structure
-- **✅ Optional Validation**: Real-browser validation with authentication support
-- **🤖 Optional AI Enrichment**: Gemini AI-powered analysis and recommendations
+- **DOM Scanning**: Extract interactable elements from HTML files or live URLs
+- **Multi-Framework Support**: Generate locators for Playwright, Selenium, or both
+- **Stability Scoring**: Automatic scoring (1-10) and categorization (High/Medium/Low)
+- **Smart Locator Generation**: CSS selectors, XPath, and Playwright role/text selectors
+- **Dynamic Detection**: Flag unstable attributes (UUIDs, timestamps, dynamic IDs)
+- **Duplicate Detection**: Identify duplicate IDs and names
+- **Code Generation**: Ready-to-use code snippets for each framework
+- **Page Object Export**: Generate complete Page Object classes
+- **Optional Validation**: Real-browser validation with authentication support
+- **Optional AI Enrichment**: Gemini AI-powered analysis and recommendations
 
-## 📦 Installation
+## Installation
 
 ### From Source (Development)
 
@@ -28,16 +63,9 @@ cd Phoenix-SmartLocatorAI
 pip install -e .
 
 # Or install with optional dependencies
-pip install -e ".[all]"      # Includes Gemini and Playwright
-pip install -e ".[gemini]"   # Gemini only
+pip install -e ".[all]"  # Includes Gemini and Playwright
+pip install -e ".[gemini]"  # Gemini only
 pip install -e ".[playwright]"  # Playwright only
-```
-
-### Install Build Tools
-
-```bash
-# Install build tools (required for building the package)
-pip install build wheel
 ```
 
 ### Build and Install Wheel
@@ -53,16 +81,16 @@ pip install dist/phoenix_smartlocatorai-1.0.0-py3-none-any.whl
 ### Dependencies
 
 **Required:**
-- `beautifulsoup4>=4.14.0` - HTML parsing
-- `requests>=2.31.0` - HTTP requests for URL scanning
-- `lxml>=6.0.0` - Fast XML/HTML parser
-- `soupsieve>=2.8` - CSS selector support
+- `beautifulsoup4>=4.14.0`
+- `requests>=2.31.0`
+- `lxml>=6.0.0`
+- `soupsieve>=2.8`
 
 **Optional:**
-- `google-generativeai>=0.3.0` - For Gemini AI enrichment (requires `GOOGLE_API_KEY`)
-- `playwright>=1.40.0` - For JavaScript rendering and validation
+- `google-generativeai>=0.3.0` (for Gemini AI enrichment)
+- `playwright>=1.40.0` (for JavaScript rendering and validation)
 
-## 🎯 Quick Start
+## Quick Start
 
 ### CLI Usage
 
@@ -140,12 +168,12 @@ result = generate_locators_from_dom(
     input_html_or_url="https://example.com",
     frameworks=["Playwright", "Selenium"],
     output_dir="./out",
-    use_js=True,      # Render JavaScript
-    validate=True,    # Validate in real browser
+    use_js=True,  # Render JavaScript
+    validate=True,  # Validate in real browser
 )
 ```
 
-## 📄 Output Files
+## Output Files
 
 ### `locators.json`
 
@@ -239,7 +267,7 @@ class ProductPage:
         self.username_input = driver.find_element(By.CSS_SELECTOR, '#username-input')
 ```
 
-## 🔐 Authenticated Validation
+## Authenticated Validation
 
 Validate locators on pages that require authentication:
 
@@ -269,7 +297,7 @@ phoenix-locgen \
   --auth-wait-selector "a.main-menu"
 ```
 
-## 🔧 CLI Reference
+## CLI Reference
 
 ```bash
 phoenix-locgen --help
@@ -296,7 +324,7 @@ phoenix-locgen --help
 - `--auth-wait-selector`: Element to wait for after login
 - `--auth-wait-url-contains`: URL substring to wait for after login
 
-## 📚 API Reference
+## API Reference
 
 ### `generate_locators_from_dom()`
 
@@ -336,9 +364,9 @@ Dictionary with paths to generated files:
 }
 ```
 
-## 🧪 Testing
+## Testing
 
-### Run Unit Tests
+Run tests with pytest:
 
 ```bash
 # Install test dependencies
@@ -347,9 +375,6 @@ pip install pytest
 # Run all tests
 pytest tests/
 
-# Run with coverage
-pytest --cov=phoenix_smartlocatorai --cov-report=html
-
 # Run specific test file
 pytest tests/test_core.py
 
@@ -357,27 +382,27 @@ pytest tests/test_core.py
 pytest -v tests/
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Phoenix-SmartLocatorAI/
 ├── src/
 │   └── phoenix_smartlocatorai/
-│       ├── __init__.py              # Package initialization and public API
-│       ├── core.py                  # Main API (generate_locators_from_dom)
-│       ├── cli.py                   # CLI tool (phoenix-locgen)
-│       ├── dom_scanner.py           # DOM scanning and locator generation
+│       ├── __init__.py          # Package initialization and public API
+│       ├── core.py              # Main API (generate_locators_from_dom)
+│       ├── cli.py               # CLI tool (phoenix-locgen)
+│       ├── dom_scanner.py       # DOM scanning and locator generation
 │       └── page_object_exporter.py  # Page Object Model generation
 ├── tests/
 │   ├── __init__.py
-│   ├── test_core.py                 # Core API tests
-│   └── test_dom_scanner.py          # DOM scanner tests
-├── pyproject.toml                   # Package configuration
-├── README.md                         # This file
-└── LICENSE                           # MIT License
+│   ├── test_core.py            # Core API tests
+│   └── test_dom_scanner.py     # DOM scanner tests
+├── pyproject.toml              # Package configuration
+├── README.md                   # This file
+└── LICENSE                     # MIT License
 ```
 
-## 💡 Examples
+## Examples
 
 ### Example 1: Basic HTML File
 
@@ -412,117 +437,15 @@ phoenix-locgen \
   --submit-selector "button[type='submit']"
 ```
 
-### Example 5: Complete Workflow
-
-```python
-from phoenix_smartlocatorai import generate_locators_from_dom
-
-# Scan a live website and generate both framework POMs
-result = generate_locators_from_dom(
-    input_html_or_url="https://testautomationpractice.blogspot.com/",
-    frameworks=["Playwright", "Selenium"],
-    output_dir="./exports",
-    class_name="TestAutomationPracticePage",
-    min_stability="Medium",
-    use_js=True,  # Render JavaScript
-)
-
-# Use the generated Page Objects in your tests
-# from exports.TestAutomationPracticePage_Playwright import TestAutomationPracticePage
-```
-
-## 🔑 API Keys Setup
-
-### Gemini AI Enrichment
-
-To use Gemini AI enrichment, set the `GOOGLE_API_KEY` environment variable:
-
-**Windows (PowerShell):**
-```powershell
-$env:GOOGLE_API_KEY = "your-api-key-here"
-```
-
-**Windows (Command Prompt):**
-```cmd
-setx GOOGLE_API_KEY "your-api-key-here"
-```
-
-**Linux/Mac:**
-```bash
-export GOOGLE_API_KEY="your-api-key-here"
-```
-
-Or add to your `.env` file:
-```
-GOOGLE_API_KEY=your-api-key-here
-```
-
-Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
-
-## 🚀 Production Ready
-
-### Production Features
-
-- **Environment Validation**: Automatic checks for API keys and system requirements
-- **Error Handling**: Comprehensive error handling with retry logic
-- **Logging**: Configurable logging levels for production monitoring
-- **Stability Scoring**: Intelligent locator stability assessment
-- **Framework Compatibility**: Automatic detection of Playwright vs Selenium compatibility
-- **Validation Support**: Real-browser validation for locator verification
-- **AI Integration**: Optional Gemini AI for enhanced analysis
-
-### Example Production Usage
-
-```python
-from phoenix_smartlocatorai import generate_locators_from_dom
-
-# Production-ready usage with all features
-result = generate_locators_from_dom(
-    input_html_or_url="https://your-production-app.com/page",
-    frameworks=["Playwright", "Selenium"],
-    output_dir="./page_objects",
-    class_name="ProductionPage",
-    min_stability="High",
-    use_js=True,
-    validate=True,
-    auth_opts={
-        "storage_state": "./auth/storage_state.json"
-    },
-    use_gemini=True,  # If GOOGLE_API_KEY is set
-)
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
+## License
 
 MIT License (see `LICENSE` file).
 
-## 🙏 Acknowledgments
+## Contributing
 
-- Built with BeautifulSoup4 for HTML parsing
-- Playwright for browser automation and validation
-- Google Gemini for AI-powered analysis
-- Selenium for cross-framework compatibility
+Contributions are welcome! Please feel free to submit a Pull Request.
 
----
-
-**Made for QA Engineers and Automation Developers who want to focus on what matters most**
-
-## 📞 Support
+## Support
 
 For issues, questions, or contributions, please visit:
-- **GitHub Repository**: https://github.com/shaktitrigent/Phoenix-SmartLocatorAI
-- **Issues**: https://github.com/shaktitrigent/Phoenix-SmartLocatorAI/issues
-
-## About
-
-Automatically generate Playwright and Selenium locators from HTML files or URLs. Get stability-scored locators, framework compatibility detection, and ready-to-use Page Object Model classes with a single command.
+https://github.com/shaktitrigent/Phoenix-SmartLocatorAI

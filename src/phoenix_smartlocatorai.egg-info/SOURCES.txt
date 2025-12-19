@@ -1,0 +1,16 @@
+LICENSE
+README.md
+pyproject.toml
+src/phoenix_smartlocatorai/__init__.py
+src/phoenix_smartlocatorai/cli.py
+src/phoenix_smartlocatorai/core.py
+src/phoenix_smartlocatorai/dom_scanner.py
+src/phoenix_smartlocatorai/page_object_exporter.py
+src/phoenix_smartlocatorai.egg-info/PKG-INFO
+src/phoenix_smartlocatorai.egg-info/SOURCES.txt
+src/phoenix_smartlocatorai.egg-info/dependency_links.txt
+src/phoenix_smartlocatorai.egg-info/entry_points.txt
+src/phoenix_smartlocatorai.egg-info/requires.txt
+src/phoenix_smartlocatorai.egg-info/top_level.txt
+tests/test_core.py
+tests/test_dom_scanner.py

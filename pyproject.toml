@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phoenix-smartlocatorai"
+version = "1.0.0"
+description = "Automated locator generation for Playwright and Selenium test automation"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+license-files = ["LICENSE"]
+authors = [
+    {name = "Phoenix Smart Locator AI", email = "support@phoenixlocator.ai"}
+]
+keywords = ["test-automation", "selenium", "playwright", "locators", "page-objects", "web-scraping"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "beautifulsoup4>=4.14.0",
+    "requests>=2.31.0",
+    "lxml>=6.0.0",
+    "soupsieve>=2.8",
+]
+
+[project.optional-dependencies]
+gemini = [
+    "google-generativeai>=0.3.0",
+]
+playwright = [
+    "playwright>=1.40.0",
+]
+all = [
+    "google-generativeai>=0.3.0",
+    "playwright>=1.40.0",
+]
+
+[project.scripts]
+phoenix-locgen = "phoenix_smartlocatorai.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+phoenix_smartlocatorai = ["py.typed"]
+
